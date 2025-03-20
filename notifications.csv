@@ -1,0 +1,28 @@
+New task created,17,1,f,2025-01-31 00:00:00
+Task deleted,16,1,f,2025-01-31 00:00:00
+Task deleted,16,1,f,2025-01-31 00:00:00
+Task deleted,16,1,f,2025-01-31 00:00:00
+New task created,19,2,t,2025-02-01 00:00:00
+New task created,18,1,t,2025-01-31 00:00:00
+Task deleted,19,2,f,2025-02-01 00:00:00
+Task deleted,19,2,f,2025-02-01 00:00:00
+Task deleted,19,2,f,2025-02-01 00:00:00
+Task deleted,18,1,f,2025-01-31 00:00:00
+Task deleted,16,1,f,2025-01-31 00:00:00
+New task created,22,1,f,2025-02-01 00:00:00
+Task deleted,22,1,f,2025-02-01 00:00:00
+Task deleted,22,1,f,2025-02-01 00:00:00
+Task deleted,22,1,f,2025-02-01 00:00:00
+New task created,23,1,f,2025-02-03 00:00:00
+New task created,24,1,f,2025-02-03 00:00:00
+New task created,25,1,f,2025-02-03 00:00:00
+Task deleted,23,1,f,2025-02-03 00:00:00
+Task deleted,25,1,f,2025-02-03 00:00:00
+New task created,26,1,f,2025-02-03 00:00:00
+"User 2 created a new Task #29 '"TESTSTSTST'"",29,2,t,2025-02-04 00:00:00
+"User 2 deleted a Task #28 '"Test111'"",28,2,t,2025-02-04 00:00:00
+"User 2 created a new Task #30 '"Test_by_deadline'"",30,2,f,2025-02-04 00:00:00
+"User 2 deleted a Task #29 '"TESTSTSTST'"",29,2,f,2025-02-04 00:00:00
+"User 2 created a new Task #31 '"new Task new lklklk'"",31,2,f,2025-02-04 00:00:00
+"User 2 created a new Task #32 '"RedisTest1'"",32,2,f,2025-02-07 00:00:00
+"User 2 created a new Task #33 '"TestRedis2'"",33,2,f,2025-02-07 00:00:00

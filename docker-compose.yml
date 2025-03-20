@@ -1,0 +1,131 @@
+services:
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0
+        container_name: elasticsearch
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=false
+            - ES_JAVA_OPTS=-Xms1g -Xmx1g
+        ports:
+            - "9200:9200"
+      
+    logstash:
+        build: ./logstash
+        container_name: logstash
+        environment:
+            - LS_ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        volumes:
+            - logs:/logs
+        depends_on:
+            - kafka
+            - elasticsearch
+        command: ["-f", "/usr/share/logstash/pipeline/logstash.conf"]
+        ports:
+            - "5044:5044"
+            - "9600:9600"
+      
+    kibana:
+        image: docker.elastic.co/kibana/kibana:8.5.0
+        container_name: kibana
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        ports:
+            - "5601:5601"
+        depends_on:
+            - elasticsearch
+        
+    redis:
+        image: redis:latest
+        container_name: redis_cache
+        restart: always
+        command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+        ports:
+            - "6379:6379"
+      
+    postgres:
+        image: postgres:latest
+        environment:
+            POSTGRES_USER: admin
+            POSTGRES_PASSWORD: 12345678
+            POSTGRES_DB: ProTaskBD
+            
+            POSTGRES_HOST_AUTH_METHOD: trust
+            POSTGRES_LOG_DESTINATION: stderr
+            POSTGRES_LOG_DIRECTORY: /var/log/postgresql
+            POSTGRES_LOG_FILENAME: postgresql.log
+            POSTGRES_LOG_MIN_DURATION_STATEMENT: 1000 
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5000:5432"
+
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.5.0
+        container_name: zookeeper
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+            ZOOKEEPER_4LW_COMMANDS_WHITELIST: ruok,stat,conf,mntr
+            ZOOKEEPER_LOG_DIR: /var/log/zookeeper
+            ZOOKEEPER_LOG_FILE: zookeeper.log
+            ZOOKEEPER_ROOT_LOGGER: INFO,ROLLINGFILE
+        ports:
+            - "2181:2181"
+
+    kafka:
+        image: confluentinc/cp-kafka:7.5.0
+        container_name: kafka
+        depends_on:
+            - zookeeper
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+        ports:
+            - "9092:9092"
+
+    frontend:
+        build: ./pro_task_frontend
+        depends_on:
+            - kafka
+            - notifications-service
+            - tasks-service
+            - auth-service
+        volumes:
+            - logs:/var/log/nginx
+        ports:
+            - "80:80"
+
+    auth-service:
+        build: ./pro_task_auth/auth
+        depends_on:
+            - kafka
+        ports:
+            - "8080:8080"
+
+    tasks-service:
+        build: ./pro_task_tasks/tasksmanager
+        depends_on:
+            - kafka
+        environment:
+            SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+        ports:
+            - "8081:8081"
+
+    notifications-service:
+        build: ./pro_task_notifications
+        depends_on:
+            - kafka
+            - tasks-service
+        environment:
+            KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+        ports:
+            - "8082:8082"
+
+volumes:
+    postgres_data:
+        driver: local
+    logs:
+        driver: local
